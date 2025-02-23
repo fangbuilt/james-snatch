@@ -1,4 +1,3 @@
-import Image from "next/image";
 import StoreHeader from "./_components/store-header";
 import FilterIsland from "./_components/filter-island";
 
