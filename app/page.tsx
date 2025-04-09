@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { useState } from "react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 
 const data = [
   {
@@ -142,6 +145,8 @@ export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
+  const [products, setProducts] = useState(data);
+
   const currentProducts = data.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -161,16 +166,63 @@ export default function Home() {
               <Button>Rating</Button>
             </div>
             <div className="grid grid-cols-3 gap-4">
+              <Card className="h-full">
+                <CardContent className="p-4 flex justify-center items-center">
+                  <Button className="">+ New Product</Button>
+                </CardContent>
+              </Card>
               {currentProducts.map((item, index) => (
                 <Card key={index}>
-                  <CardContent className="p-6">
+                  <CardContent className="p-4">
                     <img
                       src={item.thumbnailLink}
                       alt={item.product}
-                      className="rounded-lg mb-2 h-40 w-full object-cover"
+                      className="rounded-lg mb-6 h-40 w-full object-cover"
                     />
-                    <p>{item.product}</p>
-                    <p>Rp {item.price.toLocaleString()}</p>
+                    <div className="flex justify-between">
+                      <div>
+                        <p>{item.product}</p>
+                        <p>Rp {item.price.toLocaleString()}</p>
+                      </div>
+
+                      <Dialog>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger>
+                            ...
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DialogTrigger asChild>
+                              <DropdownMenuItem>Edit</DropdownMenuItem>
+                            </DialogTrigger>
+                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>
+                              Edit
+                            </DialogTitle>
+                            <DialogDescription>
+                              Description Test
+                            </DialogDescription>
+                          </DialogHeader>
+                          <Label>
+                            Product Name
+                            <Input className="mt-2" />
+                          </Label>
+                          <Label>
+                            Price
+                            <Input className="mt-2" />
+                          </Label>
+                          <DialogFooter>
+                            <Button type="submit">Confirm</Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
