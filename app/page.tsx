@@ -139,18 +139,45 @@ const data = [
   }
 ];
 
+type Product = {
+  product: string;
+  thumbnailLink: string;
+  price: number
+}
+
+type NewProductCard = {
+  isNewProductCard: true;
+}
+
+type Item = Product | NewProductCard;
+
 const itemsPerPage = 9;
 
 export default function Home() {
   const [currentPage, setCurrentPage] = useState(1);
   const totalPages = Math.ceil(data.length / itemsPerPage);
 
-  const [products, setProducts] = useState(data);
+  // const [products, setProducts] = useState(data);
 
-  const currentProducts = data.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  )
+  // const currentProducts = data.slice(
+  //   (currentPage - 1) * itemsPerPage,
+  //   currentPage * itemsPerPage
+  // )
+
+  function paginateProducts(): Item[] {
+    if (currentPage === 1) {
+      return [
+        { isNewProductCard: true },
+        ...data.slice(0, itemsPerPage - 1),
+      ];
+    } else {
+      const start = (currentPage - 1) * itemsPerPage - 1;
+      const end = start + itemsPerPage;
+      return data.slice(start, end);
+    }
+  }
+
+  const paginatedProducts = paginateProducts();
   return (
     <>
       <StoreHeader />
@@ -166,66 +193,72 @@ export default function Home() {
               <Button>Rating</Button>
             </div>
             <div className="grid grid-cols-3 gap-4">
-              <Card className="h-full">
-                <CardContent className="p-4 flex justify-center items-center">
-                  <Button className="">+ New Product</Button>
-                </CardContent>
-              </Card>
-              {currentProducts.map((item, index) => (
-                <Card key={index}>
-                  <CardContent className="p-4">
-                    <img
-                      src={item.thumbnailLink}
-                      alt={item.product}
-                      className="rounded-lg mb-6 h-40 w-full object-cover"
-                    />
-                    <div className="flex justify-between">
-                      <div>
-                        <p>{item.product}</p>
-                        <p>Rp {item.price.toLocaleString()}</p>
+              {paginatedProducts.map((item, index) => {
+                if ('isNewProductCard' in item) {
+                  return (
+                    <Card className="h-full" key="new-product">
+                      <CardContent className="p-4 h-full flex justify-center items-center">
+                        <Button className="">+ New Product</Button>
+                      </CardContent>
+                    </Card>
+                  )
+                }
+                return (
+                  <Card key={index}>
+                    <CardContent className="p-4">
+                      <img
+                        src={item.thumbnailLink}
+                        alt={item.product}
+                        className="rounded-lg mb-6 h-40 w-full object-cover"
+                      />
+                      <div className="flex justify-between">
+                        <div>
+                          <p>{item.product}</p>
+                          <p>Rp {item.price.toLocaleString()}</p>
+                        </div>
+
+                        <Dialog>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger>
+                              ...
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DialogTrigger asChild>
+                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                              </DialogTrigger>
+                              <DropdownMenuItem>Delete</DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>
+                                Edit
+                              </DialogTitle>
+                              <DialogDescription>
+                                Description Test
+                              </DialogDescription>
+                            </DialogHeader>
+                            <Label>
+                              Product Name
+                              <Input className="mt-2" />
+                            </Label>
+                            <Label>
+                              Price
+                              <Input className="mt-2" />
+                            </Label>
+                            <DialogFooter>
+                              <Button type="submit">Confirm</Button>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
                       </div>
-
-                      <Dialog>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>
-                            ...
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent>
-                            <DropdownMenuLabel>Menu</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DialogTrigger asChild>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                            </DialogTrigger>
-                            <DropdownMenuItem>Delete</DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>
-                              Edit
-                            </DialogTitle>
-                            <DialogDescription>
-                              Description Test
-                            </DialogDescription>
-                          </DialogHeader>
-                          <Label>
-                            Product Name
-                            <Input className="mt-2" />
-                          </Label>
-                          <Label>
-                            Price
-                            <Input className="mt-2" />
-                          </Label>
-                          <DialogFooter>
-                            <Button type="submit">Confirm</Button>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                )
+              })}
             </div>
             <Pagination>
               <PaginationContent>
